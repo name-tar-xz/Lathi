@@ -1,7 +1,7 @@
 #include <L298NX2.h>
 #include <HCSR04.h>
 
-HCSR04 front(2,3);//trigger , echo
+HCSR04 front(2,3);//trigger , echo |10cm away form wall to consider it as a wall, forward=5
 HCSR04 ultra2(4,5);
 HCSR04 ultra3(6,7);
 
