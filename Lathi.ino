@@ -1,10 +1,4 @@
-#include <HCSR04.h>
 #include <L298NX2.h>
-
-HCSR04 front(9, 10); // trigger , echo |10cm away form wall to consider it
-                     // as a wall, forward=5
-HCSR04 left(11, 12);
-HCSR04 right(3, 4);
 
 int IN1_A = 5;
 int IN2_A = 6;
@@ -14,18 +8,37 @@ int IN2_B = 8;
 int uTBOB;
 String str;
 
+#define usE1 10
+#define usT1 9
+#define usE2 12
+#define usT2 11
+#define usE3 4
+#define usT3 3
+
+long duration, cm;
+
 L298NX2 motor(IN1_A, IN2_A, IN1_B, IN2_B);
 
 void setup() {
-  double frontDist = front.dist();
-  double leftDist = left.dist();
-  double rightDist = right.dist();
   Serial.begin(9600);
+
+  pinMode(usE1, INPUT);
+  pinMode(usT1, OUTPUT);
+  pinMode(usE2, INPUT);
+  pinMode(usT2, OUTPUT);
+  pinMode(usE3, INPUT);
+  pinMode(usT3, OUTPUT);
+
+  double frontDist = getDistance(1, "cm");
+  double leftDist = getDistance(2, "cm");
+  double rightDist = getDistance(3, "cm");
+
   if (leftDist > rightDist) {
     uTBOB = 1;
     Serial.println("help");
-  } else if(leftDist==rightDist){Serial.println("shit");}
-  else {
+  } else if (leftDist == rightDist) {
+    Serial.println("shit");
+  } else {
     uTBOB = 0;
     Serial.println("no help");
   }
@@ -33,13 +46,12 @@ void setup() {
 }
 
 void loop() {
-  double frontDist = front.dist();
-  double leftDist = left.dist();
-  double rightDist = right.dist();
-  Serial.println(//"frontDist:" + String(frontDist) 
-                 "\nleftDist:" +String(leftDist)); 
-                 //+ "\nrightDist" + String(rightDist) + "\n");
+  double frontDist = getDistance(1, "cm");
+  double leftDist = getDistance(2, "cm");
+  double rightDist = getDistance(3, "cm");
+
   delay(1000);
+
   if (frontDist <= 5) {
     motor.stopA();
     motor.stopB();
@@ -54,6 +66,7 @@ void loop() {
     }
   }
 }
+
 void forwardForever() {
   motor.forwardA();
   motor.forwardB();
