@@ -100,3 +100,30 @@ void uTurn(int uTBOB) {
     leftTurn();
   }
 }
+
+long getDistance(int sensor = 1, String type = "cm") {
+  int trig, echo;
+  if (sensor == 1) {
+    trig = usT1;
+    echo = usE1;
+  } else if (sensor == 2) {
+    trig = usT2;
+    echo = usE2;
+  } else if (sensor == 3) {
+    trig = usT3;
+    echo = usE3;
+  } else {
+    trig = usT1;
+    echo = usE1;
+  }
+
+  digitalWrite(trig, LOW);
+  delayMicroseconds(5);
+  digitalWrite(trig, HIGH);
+  delayMicroseconds(10);
+  digitalWrite(trig, LOW);
+
+  duration = pulseIn(echo, HIGH);
+  cm = (duration / 2) / 29.1;
+  return (type == "cm") ? cm : inches;
+}
