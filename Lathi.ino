@@ -17,24 +17,32 @@ String str;
 L298NX2 motor(IN1_A, IN2_A, IN1_B, IN2_B);
 
 void setup() {
-  // put your setup code here, to run once:
-  Serial.begin(9600);
-  if (left.dist() > right.dist()) {
-    const int uTBOB = 1;
-  } else {
-    const int uTBOB = 0;
-  }
-}
-
-void loop() {
-
-  // put your main code here, to run repeatedly :
   double frontDist = front.dist();
   double leftDist = left.dist();
   double rightDist = right.dist();
+  Serial.begin(9600);
+  if (leftDist > rightDist) {
+    uTBOB = 1;
+    Serial.println("help");
+  } else if(leftDist==rightDist){Serial.println("shit");}
+  else {
+    uTBOB = 0;
+    Serial.println("no help");
+  }
+  Serial.println("uTBOB:" + String(uTBOB));
+}
 
-  delay(2500);
+void loop() {
+  double frontDist = front.dist();
+  double leftDist = left.dist();
+  double rightDist = right.dist();
+  Serial.println(//"frontDist:" + String(frontDist) 
+                 "\nleftDist:" +String(leftDist)); 
+                 //+ "\nrightDist" + String(rightDist) + "\n");
+  delay(1000);
   if (frontDist <= 5) {
+    motor.stopA();
+    motor.stopB();
     uTurn(uTBOB);
     str += "\n";
   } else {
