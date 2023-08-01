@@ -14,114 +14,117 @@ int IN2_B = 8;
 int uTBOB;
 String str;
 
-long duration, cm;
+double duration, cm;
 
 L298NX2 motor(IN1_A, IN2_A, IN1_B, IN2_B);
 
-long getDistance(int sensor = 1, String type = "cm") {
-  int trig, echo;
-  if (sensor == 1) {
-    trig = usT1;
-    echo = usE1;
-  } else if (sensor == 2) {
-    trig = usT2;
-    echo = usE2;
-  } else if (sensor == 3) {
-    trig = usT3;
-    echo = usE3;
-  } else {
-    trig = usT1;
-    echo = usE1;
-  }
+double getDistance(int sensor = 1, String type = "cm") {
+    int trig, echo;
+    if (sensor == 1) {
+        trig = usT1;
+        echo = usE1;
+    } else if (sensor == 2) {
+        trig = usT2;
+        echo = usE2;
+    } else if (sensor == 3) {
+        trig = usT3;
+        echo = usE3;
+    } else {
+        trig = usT1;
+        echo = usE1;
+    }
 
-  digitalWrite(trig, LOW);
-  delayMicroseconds(5);
-  digitalWrite(trig, HIGH);
-  delayMicroseconds(10);
-  digitalWrite(trig, LOW);
+    digitalWrite(trig, LOW);
+    delayMicroseconds(5);
+    digitalWrite(trig, HIGH);
+    delayMicroseconds(10);
+    digitalWrite(trig, LOW);
 
-  duration = pulseIn(echo, HIGH);
-  cm = (duration / 2) / 29.1;
-  return cm;
+    duration = pulseIn(echo, HIGH);
+    cm = (duration / 2) / 29.1;
+    return cm;
 }
 void forwardForever() {
-  motor.forwardA();
-  motor.forwardB();
+    motor.forwardA();
+    motor.forwardB();
 }
 void backwardForever() {
-  motor.backwardA();
-  motor.backwardB();
+    motor.backwardA();
+    motor.backwardB();
 }
 void leftTurn() {
-  motor.forwardForA(400);
-  motor.backwardForB(400);
+    motor.forwardForA(4);
+    motor.backwardForB(4);
 }
 void rightTurn() {
-  motor.forwardForA(400);
-  motor.backwardForB(400);
+    motor.forwardForA(4);
+    motor.backwardForB(4);
 }
 void uTurn(int uTBOB) {
-  if (uTBOB == 0) {
-    motor.backwardForA(50);
-    motor.backwardForB(50);
-    rightTurn();
-    motor.forwardForA(150);
-    motor.forwardForB(150);
-    rightTurn();
-  } else {
-    motor.backwardForA(50);
-    motor.backwardForB(50);
-    leftTurn();
-    motor.forwardForA(150);
-    motor.forwardForB(150);
-    leftTurn();
-  }}  
+    if (uTBOB == 0) {
+        motor.backwardForA(15);
+        motor.backwardForB(15);
+        rightTurn();
+        motor.forwardForA(15);
+        motor.forwardForB(15);
+        rightTurn();
+    } else {
+        motor.backwardForA(5);
+        motor.backwardForB(5);
+        leftTurn();
+        motor.forwardForA(5);
+        motor.forwardForB(5);
+        leftTurn();
+    }
+}
 void setup() {
-  Serial.begin(9600);
+    Serial.begin(9600);
 
-  pinMode(usE1, INPUT);
-  pinMode(usT1, OUTPUT);
-  pinMode(usE2, INPUT);
-  pinMode(usT2, OUTPUT);
-  pinMode(usE3, INPUT);
-  pinMode(usT3, OUTPUT);
+    pinMode(usE1, INPUT);
+    pinMode(usT1, OUTPUT);
+    pinMode(usE2, INPUT);
+    pinMode(usT2, OUTPUT);
+    pinMode(usE3, INPUT);
+    pinMode(usT3, OUTPUT);
 
-  double frontDist = getDistance(1, "cm");
-  double leftDist = getDistance(2, "cm");
-  double rightDist = getDistance(3, "cm");
+    double frontDist = getDistance(1, "cm");
+    double leftDist = getDistance(2, "cm");
+    double rightDist = getDistance(3, "cm");
 
-  if (leftDist > rightDist) {
-    uTBOB = 1;
-    Serial.println("help");
-  } else if (leftDist == rightDist) {
-    Serial.println("shit");
-  } else {
-    uTBOB = 0;
-    Serial.println("no help");
-  }
-  Serial.println("uTBOB:" + String(uTBOB));
+    if (leftDist > rightDist) {
+        uTBOB = 1;
+        Serial.println("help");
+    } else if (leftDist == rightDist) {
+        Serial.println("shit");
+    } else {
+        uTBOB = 0;
+        Serial.println("no help");
+    }
+    Serial.println("uTBOB:" + String(uTBOB));
+    motor.forward();
 }
 
 void loop() {
-  double frontDist = getDistance(1, "cm");
-  double leftDist = getDistance(2, "cm");
-  double rightDist = getDistance(3, "cm");
-  //Serial.println("frontDist:" + String(frontDist) + "\nleftDist:" +
-  //               String(leftDist) + "\nrightDist" + String(rightDist) + "\n");
-  delay(1000);
+    delay(1000);
 
-  if (frontDist <= 5) {
-    motor.stopA();
-    motor.stopB();
-    uTurn(uTBOB);
-    str += "\n";
-  } else {
-    forwardForever();
-    if (leftDist <= 10 || rightDist <= 10) {
-      str += "1";
+    double frontDist = getDistance(1, "cm");
+    double leftDist = getDistance(2, "cm");
+    double rightDist = getDistance(3, "cm");
+    Serial.println("frontDist:" + String(frontDist) + "\nleftDist:" +
+                   String(leftDist) + "\nrightDist:" + String(rightDist));
+
+    if (frontDist <= 5) {
+        motor.stopA();
+        motor.stopB();
+        uTurn(uTBOB);
+        str += "\n";
     } else {
-      str += "0";
+        forwardForever();
+        if (leftDist <= 10 || rightDist <= 10) {
+            str += "1";
+        } else {
+            str += "0";
+        }
     }
-  }
-  Serial.println("---\n"+str+"\n---");
+    Serial.println("---\n" + str + "\n---");
 }
