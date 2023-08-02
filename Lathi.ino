@@ -52,28 +52,38 @@ void backwardForever() {
     motor.backwardA();
     motor.backwardB();
 }
+int d1=325;
+int ds=250;
 void leftTurn() {
-    motor.forwardForA(4);
-    motor.backwardForB(4);
+    motor.forwardB();
+    motor.backwardA();
+    delay(d1);
+    motor.stop();
+    delay(ds);
 }
 void rightTurn() {
-    motor.forwardForA(4);
-    motor.backwardForB(4);
+    motor.forwardA();
+    motor.backwardB();
+    delay(d1);
+    motor.stop();
+    delay(ds);
 }
 void uTurn(int uTBOB) {
+    int d2=250;
+    motor.stop();
     if (uTBOB == 0) {
-        motor.backwardForA(15);
-        motor.backwardForB(15);
         rightTurn();
-        motor.forwardForA(15);
-        motor.forwardForB(15);
+        motor.forward();
+        delay(d2);
+        motor.stop();
+        delay(ds);
         rightTurn();
     } else {
-        motor.backwardForA(5);
-        motor.backwardForB(5);
         leftTurn();
-        motor.forwardForA(5);
-        motor.forwardForB(5);
+        motor.forward();
+        delay(d2);
+        motor.stop();
+        delay(ds);
         leftTurn();
     }
 }
@@ -93,33 +103,32 @@ void setup() {
 
     if (leftDist > rightDist) {
         uTBOB = 1;
-        Serial.println("help");
     } else if (leftDist == rightDist) {
         Serial.println("shit");
     } else {
         uTBOB = 0;
-        Serial.println("no help");
     }
-    Serial.println("uTBOB:" + String(uTBOB));
-    motor.forward();
 }
 
 void loop() {
-    delay(1000);
-
     double frontDist = getDistance(1, "cm");
     double leftDist = getDistance(2, "cm");
     double rightDist = getDistance(3, "cm");
-    Serial.println("frontDist:" + String(frontDist) + "\nleftDist:" +
-                   String(leftDist) + "\nrightDist:" + String(rightDist));
+    // Serial.println("frontDist:" + String(frontDist) + "\nleftDist:" +
+    // String(leftDist) + "\nrightDist:" + String(rightDist));
 
-    if (frontDist <= 5) {
-        motor.stopA();
-        motor.stopB();
+    if (frontDist <= 10) {
         uTurn(uTBOB);
+        if(uTBOB==0) {
+            uTBOB=1;
+        }
+        else if(uTBOB==1) {
+            uTBOB=0;
+        }
+        // Serial.println("uTBOB:" + String(uTBOB));
         str += "\n";
     } else {
-        forwardForever();
+        motor.forward();
         if (leftDist <= 10 || rightDist <= 10) {
             str += "1";
         } else {
