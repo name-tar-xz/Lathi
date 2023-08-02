@@ -44,13 +44,18 @@ double getDistance(int sensor = 1, String type = "cm") {
     cm = (duration / 2) / 29.1;
     return cm;
 }
-void forwardForever() {
-    motor.forwardA();
-    motor.forwardB();
-}
-void backwardForever() {
-    motor.backwardA();
-    motor.backwardB();
+bool lastLine(String str) {
+    Serial.begin(9600);
+    String sub="";
+    String one="";
+    int n=str.lastIndexOf("\n");
+    for (int i=n+1; i<str.length(); i++) {
+        sub+=str.charAt(i);
+    }
+    for(int i=0; i<sub.length(); i++) {
+        one+="1";
+    }
+    return(sub.equals(one));
 }
 int d1=325;
 int ds=250;
@@ -118,12 +123,17 @@ void loop() {
     // String(leftDist) + "\nrightDist:" + String(rightDist));
 
     if (frontDist <= 10) {
-        uTurn(uTBOB);
-        if(uTBOB==0) {
-            uTBOB=1;
-        }
-        else if(uTBOB==1) {
-            uTBOB=0;
+        if(lastLine(str)) {
+            Serial.println(str);
+            motor.stop();
+        } else {
+            uTurn(uTBOB);
+            if(uTBOB==0) {
+                uTBOB=1;
+            }
+            else if(uTBOB==1) {
+                uTBOB=0;
+            }
         }
         // Serial.println("uTBOB:" + String(uTBOB));
         str += "\n";
@@ -135,5 +145,5 @@ void loop() {
             str += "0";
         }
     }
-    Serial.println("---\n" + str + "\n---");
+    // Serial.println("---\n" + str + "\n---");
 }
